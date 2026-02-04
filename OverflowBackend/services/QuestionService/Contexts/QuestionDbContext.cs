@@ -7,6 +7,7 @@ namespace QuestionService.Contexts
     {
         public DbSet<Question> Questions { get; set; }
         public  DbSet<Tag> Tags{ get; set; }
+        public DbSet<Answer> Answers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -95,6 +96,11 @@ namespace QuestionService.Contexts
                         "An architectural style that structures an application as a collection of loosely coupled services that can be independently deployed and scaled."
                 }
 );
+
+            modelBuilder.Entity<Answer>().HasOne(a => a.Question)
+                .WithMany(q => q.Answers)
+                .HasForeignKey(a => a.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }
