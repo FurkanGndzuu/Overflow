@@ -10,7 +10,7 @@ namespace QuestionService.Entities
         [MaxLength(5000)]
 
         public required string Context { get; set; }
-        public required IList<string> TagSlugs { get; set; }
+        public required List<string> TagSlugs { get; set; }
         [MaxLength(100)]
         public required string AskerId { get; set; }
         [MaxLength(100)]
@@ -20,5 +20,7 @@ namespace QuestionService.Entities
         public int Views { get; set; }
         public bool HasAcceptedAnswer { get; set; }
         public int Votes { get; set; }
+        public int AnswerCount { get; set; }
+        public List<Answer> Answers { get; set; }
     }
 }

@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using QuestionService.Contexts;
+using QuestionService.Services;
 using Scalar.AspNetCore;
+using Wolverine;
+using Wolverine.RabbitMQ;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +14,9 @@ builder.Services.AddControllers();
 
 builder.AddServiceDefaults();
 builder.Services.AddOpenApi();
+builder.Services.AddMemoryCache();
+
+builder.Services.AddScoped<TagService>();
 
 var connString = builder.Configuration.GetConnectionString("questionDb");
 
@@ -21,6 +29,17 @@ builder.Services.AddAuthentication().AddKeycloakJwtBearer("keycloak" , "overflow
 {
     options.Audience = "overflow";
     options.RequireHttpsMetadata = false;
+});
+builder.Services.AddOpenTelemetry().WithTracing(conf =>
+{
+    conf.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(builder.Environment.ApplicationName))
+    .AddSource("Wolverine");
+});
+
+builder.Host.UseWolverine(config =>
+{
+    config.UseRabbitMqUsingNamedConnection("messaging");
+    config.PublishAllMessages().ToRabbitExchange("questions");
 });
 
 builder.Services.AddAuthorization();
