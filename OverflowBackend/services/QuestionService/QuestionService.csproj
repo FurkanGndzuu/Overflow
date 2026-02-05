@@ -20,12 +20,13 @@
     </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" Version="2.12.24" />
     <PackageReference Include="Scalar.AspNetCore.Swashbuckle" Version="2.12.24" />
-    <PackageReference Include="WolverineFx.RabbitMQ" Version="5.13.0" />
+  
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\common\Common\Common.csproj" />
     <ProjectReference Include="..\..\common\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\..\OverflowBackend.ServiceDefaults\OverflowBackend.ServiceDefaults.csproj" />
+  
   </ItemGroup>
 
 </Project>
