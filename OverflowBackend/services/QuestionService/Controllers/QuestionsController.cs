@@ -219,7 +219,7 @@ namespace QuestionService.Controllers
 
             return NoContent();
         }
-        [HttpPost("{questionId}/answers/{answerId}")]
+        [HttpPut("{questionId}/answers/{answerId}")]
         [Authorize]
 
         public async Task<ActionResult> UpdateAnswer(string questionId, string answerId, CreateAnswerDto dto)
@@ -234,5 +234,20 @@ namespace QuestionService.Controllers
             await db.SaveChangesAsync();
             return NoContent();
         }
+
+        [HttpGet("errors")]
+        public ActionResult TriggerError(int code)
+        {
+            return code switch
+            {
+                400 => BadRequest("This is a bad request example."),
+                401 => Unauthorized("This is an unauthorized example."),
+                403 => Forbid("This is a forbidden example."),
+                404 => NotFound("This is a not found example."),
+                500 => StatusCode(500, "This is an internal server error example."),
+                _ => Ok("No error triggered.")
+            };
+        }
+        
     }
 }
