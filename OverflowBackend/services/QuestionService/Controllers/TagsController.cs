@@ -6,7 +6,7 @@ using QuestionService.Entities;
 
 namespace QuestionService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class TagsController(QuestionDbContext db) : ControllerBase
     {
