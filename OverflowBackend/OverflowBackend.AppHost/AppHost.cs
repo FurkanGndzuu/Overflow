@@ -1,18 +1,19 @@
 using Aspire.Hosting;
+using k8s.KubeConfigModels;
 using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
 var compose = builder.AddDockerComposeEnvironment("production")
-    .WithDashboard(config => config.WithHostPort(8080));
+    .WithDashboard(config => config.WithHostPort(8081));
 
 // Suppress ASPIRECERTIFICATES001 for evaluation purposes
 #pragma warning disable ASPIRECERTIFICATES001
 var keycloak = builder.AddKeycloak("keycloak", 6001).WithoutHttpsCertificate().WithDataVolume("keycloak-data")
     .WithEnvironment("KC_HTTP_ENABLED", "true")
     .WithEnvironment("KC_HOSTNAME_STRICT", "false")
-    .WithRealmImport("../infra/realms")
-    .WithEndpoint(6001, 8080, "keycloak", isExternal: true);
+    .WithRealmImport("../infra/realms");
+  // .WithEndpoint(6001,8080,name:"keycloak" , isExternal:true);
 #pragma warning restore ASPIRECERTIFICATES001
 
 
@@ -56,6 +57,11 @@ var gateway = builder.AddYarp("overflow-proxy").WithConfiguration(yarpBuilder =>
 
 }).WithEnvironment("ASPNETCORE_URLS", "http://*:8001")
     .WithEndpoint(port: 8001, scheme: "http", targetPort: 8001, name: "gateway", isExternal: true);
+
+var webbapp = builder.AddJavaScriptApp("webapp", "../../OverflowFrontend/webapp", "dev")
+    .WithReference(keycloak)
+    .WithEndpoint(env: "PORT", port: 3000, scheme:"http");
+
 
 if (!builder.Environment.IsDevelopment())
 {
