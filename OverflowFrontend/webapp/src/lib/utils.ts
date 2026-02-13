@@ -10,6 +10,15 @@ export function errorToast(error : { message?: string  , status?: number}) {
         
     })
 }
+export function successToast(message : string , title?:string) {
+    return addToast({
+
+        title: title || "Success",
+        description: message || 'No Response Message',
+        color: 'success'
+        
+    })
+}
 
 export function handleError (error : { message?: string  , status?: number}){
 

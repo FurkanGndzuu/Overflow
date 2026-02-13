@@ -1,3 +1,4 @@
+import { auth } from '@/auth';
 import { notFound } from 'next/navigation';
 
 export async function fetchClient<T>(url: string,
@@ -11,8 +12,14 @@ export async function fetchClient<T>(url: string,
 
     if(!apiUrl) throw new Error('API URL is not defined in environment variables');
 
+
+     const session = await auth();
+    
     const headers : HeadersInit = {
         'Content-Type': 'application/json',
+         ...(session?.accessToken
+            ? { Authorization: `Bearer ${session.accessToken}` }
+            : {}),
         ...rest.headers
     };
     
@@ -34,15 +41,26 @@ export async function fetchClient<T>(url: string,
          if (response.status === 500) throw new Error("Server error. Please try again later.");
 
         let message = '';
-         if (typeof parsed === 'string') {
+         if (response.status === 401) {
+            const authHeader = response.headers.get('WWW-Authenticate');
+            if (authHeader?.includes('error_description')) {
+                const match = authHeader.match(/error_description="(.+?)"/);
+                if (match) message = match[1];
+            } else {
+                message = "You must be logged in to do that"
+            }
+        }
+
+        if (!message) {
+            if (typeof parsed === 'string') {
                 message = parsed
             } else if (parsed?.message) {
                 message = parsed?.message;
+            } else {
+                message = getFallbackMessage(response.status)
             }
-
-        if (!message) {
-            message = getFallbackMessage(response.status);
         }
+
 
         return { data: null, error: {message, status: response.status}};
       

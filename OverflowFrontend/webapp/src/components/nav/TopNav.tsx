@@ -2,9 +2,14 @@ import { AcademicCapIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import ThemeSwitcher from "./ThemeToggle";
 import SearchInput from "./SearchInput";
+import LoginButton from "./LoginButton";
+import { getCurrentUser } from "@/lib/actions/authTest-action";
+import UserMenu from "./UserMenu";
 
 
 export default async function TopNav() {
+
+    const user = await getCurrentUser();
     
     
     return (
@@ -24,9 +29,15 @@ export default async function TopNav() {
                 </div>
 
                 <SearchInput />
+              
 
                 <div className="flex grow justify-end items-center gap-4">
             <ThemeSwitcher />
+              {
+                    user ? (
+                        <UserMenu user={user} />
+                    ) : (<LoginButton />)
+                }
             </div>
                 
             </div>
